@@ -1,50 +1,23 @@
-from ldap3 import Server, Connection, ALL, SUBTREE
+import os
 
-AD_SERVER = "192.168.92.131"
-AD_USER = "Administrator@local.empresa"
-AD_PASSWORD = "LabAD@Server2026!"
-BASE_DN = "DC=local,DC=empresa"
+from flask import Flask, render_template
 
-server = Server(AD_SERVER, get_info=ALL)
+from api.routes import api
 
-conn = Connection(
-    server,
-    user=AD_USER,
-    password=AD_PASSWORD,
-    auto_referrals=False,
-    auto_bind=True
-)
 
-print("Conectado ao Active Directory!")
+def create_app():
+    app = Flask(__name__)
+    app.config["JSON_SORT_KEYS"] = False
+    app.register_blueprint(api, url_prefix="/api")
 
-consultas = [
-    (
-        "USUÁRIOS",
-        "(&(objectCategory=person)(objectClass=user))",
-        ["cn", "sAMAccountName", "mail"],
-    ),
-    (
-        "OUS",
-        "(objectClass=organizationalUnit)",
-        ["ou", "description"],
-    ),
-    (
-        "GRUPOS",
-        "(objectClass=group)",
-        ["cn", "sAMAccountName", "description"],
-    ),
-]
+    @app.get("/")
+    def index():
+        return render_template("index.html")
 
-for titulo, filtro, atributos in consultas:
-    conn.search(
-        search_base=BASE_DN,
-        search_filter=filtro,
-        search_scope=SUBTREE,
-        attributes=atributos,
-    )
+    return app
 
-    print(f"\n=== {titulo} ({len(conn.entries)}) ===")
-    for entry in conn.entries:
-        print(entry)
 
-conn.unbind()
+app = create_app()
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", "5051")), debug=False)
