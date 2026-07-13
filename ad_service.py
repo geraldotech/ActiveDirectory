@@ -307,17 +307,17 @@ class ActiveDirectoryService:
         return self.get_ou(dn)
 
     def list_groups(self):
-        return [self._group(entry) for entry in self._search("(objectClass=group)", ["cn", "sAMAccountName", "distinguishedName", "groupType", "member", "description"])]
+        return [self._group(entry) for entry in self._search("(objectClass=group)", ["cn", "sAMAccountName", "distinguishedName", "groupType", "member", "managedBy", "description"])]
 
     def get_group(self, identifier):
-        return self._group(self._find_one(identifier, "group", ["cn", "sAMAccountName", "distinguishedName", "groupType", "member", "description"]))
+        return self._group(self._find_one(identifier, "group", ["cn", "sAMAccountName", "distinguishedName", "groupType", "member", "managedBy", "description"]))
 
     def _group(self, entry):
         group_type = int(self._value(entry, "groupType", 0))
         scope = "Universal" if group_type & 8 else "Domain Local" if group_type & 4 else "Global"
         category = "Security" if group_type & 0x80000000 else "Distribution"
         dn = entry.entry_dn
-        return {"id": dn, "name": self._value(entry, "cn"), "username": self._value(entry, "sAMAccountName"), "dn": dn, "type": f"{scope} / {category}", "groupType": group_type, "members": self._values(entry, "member"), "description": self._value(entry, "description")}
+        return {"id": dn, "name": self._value(entry, "cn"), "username": self._value(entry, "sAMAccountName"), "dn": dn, "type": f"{scope} / {category}", "groupType": group_type, "members": self._values(entry, "member"), "managedBy": self._value(entry, "managedBy"), "description": self._value(entry, "description")}
 
     def create_group(self, data):
         self._require(data, "name", "ouDn")
