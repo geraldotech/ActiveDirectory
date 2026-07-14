@@ -58,6 +58,8 @@ Do not commit the `.env` file or expose the AD password in frontend code or API 
 <img width="1904" height="871" alt="Active Directory Web Admin interface" src="https://github.com/user-attachments/assets/e877431e-0be2-4732-8232-4d4deefefe7f" />
 
 
+#### 
+
 <img width="885" height="256" alt="image" src="https://github.com/user-attachments/assets/104f32f8-51df-4503-94ff-5fc271d9a3da" />
 
 
